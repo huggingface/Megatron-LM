@@ -101,11 +101,12 @@ setuptools.setup(
         'Natural Language :: English',
         'Operating System :: OS Independent',
     ],
-    packages=['megatron.core', 'megatron.core.pipeline_parallel', 'megatron.core.tensor_parallel'], 
+    python_requires=">=3.6",
+    packages=setuptools.find_packages(),
     install_requires=install_requires,
-
     # Add in any packaged data.
     include_package_data=True,
+    zip_safe=False,
     # PyPI package information.
     keywords=__keywords__,
 )
