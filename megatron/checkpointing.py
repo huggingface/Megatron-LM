@@ -14,6 +14,7 @@ from megatron.core import mpu, tensor_parallel
 from .global_vars import get_args
 from .utils import (unwrap_model,
                     print_rank_0)
+from megatron.model.enums import PositionEmbeddingType
 
 
 _CHECKPOINT_VERSION = None
@@ -56,8 +57,17 @@ def check_checkpoint_args(checkpoint_args):
     _compare('hidden_size')
     _compare('num_attention_heads')
     _compare('add_position_embedding', default=True)
+    try:
+        _compare('position_embedding_type')
+    except AttributeError as e:
+        print_rank_0(f" Warning, trying to load an old checkpoint: {e}")
+        assert args.position_embedding_type == PositionEmbeddingType.learned_absolute, \
+        f"Checkpoint uses PositionEmbeddingType.learned_absolute, but input argument value was: \
+            {args.position_embedding_type}"
     if args.vocab_file:
-        _compare('max_position_embeddings')
+        # with alibi we can change `max_position_embeddings`
+        if args.position_embedding_type != PositionEmbeddingType.alibi:
+            _compare('max_position_embeddings')
         _compare('make_vocab_size_divisible_by')
         _compare('padded_vocab_size')
         _compare('tokenizer_type')
