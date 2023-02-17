@@ -406,7 +406,7 @@ class MixedPrecisionOptimizer(MegatronOptimizer):
 
 
     def reload_model_params(self):
-        self._copy_main_params_to_model_params()
+        self._copy_model_params_to_main_params()
 
 
     def _unscale_main_grads_and_check_for_nan(self):
@@ -661,6 +661,13 @@ class Float16OptimizerWithFloat16Params(MixedPrecisionOptimizer):
         # Only needed for the float16 params.
         model_data, main_data = self._get_model_and_main_params_data_float16()
         _multi_tensor_copy_this_to_that(this=main_data, that=model_data,
+                                        overflow_buf=self._dummy_overflow_buf)
+
+
+    def _copy_model_params_to_main_params(self):
+        # Only needed for the float16 params.
+        model_data, main_data = self._get_model_and_main_params_data_float16()
+        _multi_tensor_copy_this_to_that(this=model_data, that=main_data,
                                         overflow_buf=self._dummy_overflow_buf)
 
 
