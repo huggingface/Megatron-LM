@@ -694,6 +694,3 @@ class DistributedOptimizer(MixedPrecisionOptimizer):
                           self.model_float16_groups)
         copy_group_params(self.shard_fp32_groups,
                           self.model_fp32_groups)
-    def _copy_model_params_to_main_params(self):
-        # following https://github.com/huggingface/Megatron-LM/blob/100b522bb8044d98413398f9e71563af15b83325/megatron/optimizer/optimizer.py#L667
-        self._copy_main_params_to_model_params()
