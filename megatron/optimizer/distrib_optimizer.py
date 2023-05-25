@@ -714,7 +714,7 @@ class DistributedOptimizer(MixedPrecisionOptimizer):
                     shard_model_grad = model_grad.view(-1) \
                         [param_range.start:param_range.end]
 
-                    shard_main_param.copy_(shard_model_grad.data)
+                    shard_main_param.copy_(shard_model_grad)
 
         # Copy model groups to shard groups
         copy_group_params(self.model_float16_groups,
