@@ -51,6 +51,9 @@ def generate_and_post_process(model,
         stop_on_eol=stop_on_eol,
         prevent_newline_after_colon=prevent_newline_after_colon,
         random_seed=random_seed)
+    
+    if return_tokens:
+        return tokens
 
     if return_tokens:
         return tokens

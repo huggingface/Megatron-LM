@@ -267,6 +267,7 @@ class CoreAttention(MegatronModule):
         # ===================================
         # Raw attention scores. [b, np, s, s]
         # ===================================
+        np = query_layer.size(2)
 
         # [b, np, sq, sk]
         output_size = (query_layer.size(1),
@@ -341,7 +342,7 @@ class CoreAttention(MegatronModule):
 
         # context layer shape: [b, np, sq, hn]
         output_size = (value_layer.size(1),
-                       value_layer.size(2),
+                       np,
                        query_layer.size(0),
                        value_layer.size(3))
 
@@ -705,11 +706,11 @@ class ParallelAttention(MegatronModule):
             dtype=self.params_dtype,
             device=torch.cuda.current_device())
 
+
     def forward(self, hidden_states, attention_mask,
                 encoder_output=None, inference_params=None,
                 rotary_pos_emb=None, alibi=None):
         # hidden_states: [sq, b, h]
-
         # =================================================
         # Pre-allocate memory for key-values for inference.
         # =================================================
@@ -882,7 +883,6 @@ class ParallelAttention(MegatronModule):
         # =================
         # Output. [sq, b, h]
         # =================
-
         output, bias = self.dense(context_layer)
 
         return output, bias

@@ -129,8 +129,6 @@ class Embedding(MegatronModule):
     Arguments:
         hidden_size: hidden size
         vocab_size: vocabulary size
-        max_sequence_length: maximum size of sequence. This
-                             is used for positional embedding
         embedding_dropout_prob: dropout probability for embeddings
         init_method: weight initialization method
         num_tokentypes: size of the token-type embeddings. 0 value
@@ -140,7 +138,6 @@ class Embedding(MegatronModule):
     def __init__(self,
                  hidden_size,
                  vocab_size,
-                 max_sequence_length,
                  embedding_dropout_prob,
                  init_method,
                  num_tokentypes=0):
@@ -177,6 +174,8 @@ class Embedding(MegatronModule):
             # Initialize the position embeddings.
             if args.perform_initialization:
                 self.init_method(self.position_embeddings.weight)
+        else:
+            self.position_embeddings = None
 
         # Token type embedding.
         # Add this as an optional field that can be added through
@@ -369,7 +368,6 @@ class TransformerLanguageModel(MegatronModule):
         if self.pre_process:
             self.embedding = Embedding(self.hidden_size,
                                        args.padded_vocab_size,
-                                       args.max_position_embeddings,
                                        args.hidden_dropout,
                                        self.init_method,
                                        self.num_tokentypes)

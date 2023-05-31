@@ -319,6 +319,13 @@ class MegatronOptimizer(ABC):
             timers('backward-key-value-all-reduce').stop()
 
 
+        # All-reduce key-value grads if needed.
+        if args.attention_head_type == "multiquery":
+            timers('backward-key-value-all-reduce').start()
+            self.allreduce_key_value_grads(args)
+            timers('backward-key-value-all-reduce').stop()
+
+
 
 class MixedPrecisionOptimizer(MegatronOptimizer):
     """Base class for both the float-16 and the distributed optimizer.
