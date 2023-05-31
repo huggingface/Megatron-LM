@@ -574,6 +574,14 @@ def load_checkpoint(model, optimizer, opt_param_scheduler, load_arg='load', stri
                               release=release)
 
     if model_state_dict is None:
+
+        # Conditionally exit at this point.
+        if args.exit_on_missing_checkpoint:
+            print_rank_0(">> '--exit-on-missing-checkpoint' set ... exiting. <<")
+            torch.distributed.barrier()
+            sys.exit()
+
+        # Iteration defaults to 0.
         return 0
 
     # set checkpoint version
@@ -597,7 +605,7 @@ def load_checkpoint(model, optimizer, opt_param_scheduler, load_arg='load', stri
     # Check arguments.
     assert args.consumed_train_samples == 0
     assert args.consumed_valid_samples == 0
-    if 'args' in model_state_dict:
+    if 'args' in model_state_dict and not args.finetune:
         checkpoint_args = model_state_dict['args']
         check_checkpoint_args(checkpoint_args)
         if not args.finetune:
@@ -638,6 +646,9 @@ def load_checkpoint(model, optimizer, opt_param_scheduler, load_arg='load', stri
                          'attempting to load the optimizer state, '
                          'exiting ...'.format(model_checkpoint_name))
             sys.exit()
+    else:
+        if args.fp16 and optimizer is not None:
+            optimizer.reload_model_params()
 
     # rng states.
     if not release and not args.finetune and not args.no_load_rng:
