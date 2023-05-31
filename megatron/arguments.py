@@ -11,7 +11,6 @@ import types
 
 import torch.nn.functional as F
 from megatron.global_vars import set_retro_args, get_retro_args
-from tools.retro.utils import get_args_path as get_retro_args_path
 
 from megatron.core.transformer import TransformerConfig
 
@@ -399,6 +398,9 @@ def validate_args(args, defaults={}):
             "retro currently does not support pipeline parallelism."
 
         # Load retro args.
+        def get_retro_args_path(workdir):
+            '''Argument copy stored within retro workdir.'''
+            return os.path.join(workdir, "args.json")
         retro_args_path = get_retro_args_path(args.retro_workdir)
         assert os.path.exists(retro_args_path), "retro workdir missing args.json"
         with open(retro_args_path) as f:
