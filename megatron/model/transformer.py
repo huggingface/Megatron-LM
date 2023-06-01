@@ -505,7 +505,7 @@ class MultiQueryCoreAttention(CoreAttention):
         # seem a bit unusual, but is taken from the original Transformer paper.
 
         if not self.sequence_parallel:
-            with mpu.get_cuda_rng_tracker().fork():
+            with tensor_parallel.get_cuda_rng_tracker().fork():
                 attention_probs = self.attention_dropout(attention_probs)
         else:
             attention_probs = self.attention_dropout(attention_probs)

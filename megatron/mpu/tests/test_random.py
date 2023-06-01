@@ -101,19 +101,19 @@ def test_cuda_rng_tracker(tensor_model_parallel_size):
     # Now if we interleave seed_1 and seed_2,
     # we should still get the same tensors
     torch.cuda.manual_seed(seed_1)
-    mpu.get_cuda_rng_tracker().add('test', seed_2)
+    tensor_parallel.get_cuda_rng_tracker().add('test', seed_2)
 
     torch.randn(size, out=tensor)
     result_11 = tensor.clone()
 
-    with mpu.get_cuda_rng_tracker().fork('test'):
+    with tensor_parallel.get_cuda_rng_tracker().fork('test'):
         torch.randn(size, out=tensor)
         result_21 = tensor.clone()
 
     torch.randn(size, out=tensor)
     result_12 = tensor.clone()
 
-    with mpu.get_cuda_rng_tracker().fork('test'):
+    with tensor_parallel.get_cuda_rng_tracker().fork('test'):
         torch.randn(size, out=tensor)
         result_22 = tensor.clone()
 
@@ -131,7 +131,7 @@ def test_cuda_rng_tracker(tensor_model_parallel_size):
     assert error < 1.0e-6
 
     # Reset the tracker
-    mpu.get_cuda_rng_tracker().reset()
+    tensor_parallel.get_cuda_rng_tracker().reset()
 
     # Reset groups
     mpu.destroy_model_parallel()
@@ -152,12 +152,12 @@ def test_model_parallel_cuda_manual_seed(tensor_model_parallel_size):
 
     mpu.model_parallel_cuda_manual_seed(12345)
     assert torch.cuda.initial_seed() == 12345
-    with mpu.get_cuda_rng_tracker().fork():
+    with tensor_parallel.get_cuda_rng_tracker().fork():
         assert torch.cuda.initial_seed() == (12345 + 2718 +
                                              mpu.get_tensor_model_parallel_rank())
 
     # Reset the tracker
-    mpu.get_cuda_rng_tracker().reset()
+    tensor_parallel.get_cuda_rng_tracker().reset()
 
     # Reset groups
     mpu.destroy_model_parallel()
