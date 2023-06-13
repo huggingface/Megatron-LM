@@ -5,6 +5,7 @@ from setuptools import setup, find_packages
 import importlib.util
 import os
 import setuptools
+from torch.utils import cpp_extension
 
 spec = importlib.util.spec_from_file_location('package_info', 'megatron/core/package_info.py')
 package_info = importlib.util.module_from_spec(spec)
@@ -104,6 +105,14 @@ setuptools.setup(
     python_requires=">=3.6",
     packages=setuptools.find_packages(),
     install_requires=install_requires,
+    ext_modules=[
+        setuptools.Extension(
+            name="megatron.data.helpers",
+            sources=["megatron/data/helpers.cpp"],
+            include_dirs=cpp_extension.include_paths(),
+            language='c++'
+        ),
+    ],
     # Add in any packaged data.
     include_package_data=True,
     zip_safe=False,
