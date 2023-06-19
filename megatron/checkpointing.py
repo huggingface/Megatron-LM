@@ -400,6 +400,7 @@ def _load_base_checkpoint(load_dir, rank0=False):
             print_rank_0(f' loading checkpoint from {load_dir} at iteration {iteration}')
 
     # Load the checkpoint.
+    optim_state_dict = {}
     try:
         state_dict = torch.load(checkpoint_name, map_location='cpu')
     except ModuleNotFoundError:
