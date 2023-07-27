@@ -276,7 +276,7 @@ def validate_args(args, defaults={}):
         if args.decoder_seq_length is not None:
             assert args.max_position_embeddings >= args.decoder_seq_length
     else:
-        assert args.max_position_embeddings is None
+        assert args.max_position_embeddings is not None
         
     if args.lr is not None:
         assert args.min_lr <= args.lr
@@ -619,6 +619,9 @@ def _add_training_args(parser):
     group.add_argument('--no-bias-dropout-fusion', action='store_false',
                        help='Disable bias and dropout fusion.',
                        dest='bias_dropout_fusion')
+    group.add_argument('--use-flash-attn', action='store_true',
+                       help='use FlashAttention implementation of attention. '
+                       'https://arxiv.org/abs/2205.14135')
     group.add_argument('--optimizer', type=str, default='adam',
                        choices=['adam', 'sgd'],
                        help='Optimizer function')
